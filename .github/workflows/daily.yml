@@ -1,0 +1,34 @@
+name: Daily Newsletter
+
+on:
+  push:                    # remove this line later if you only want the daily run
+  schedule:
+    - cron: '0 2 * * *'    # 08:00 IST
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install deps
+        run: |
+          pip install -r backend/requirements.txt
+
+      - name: Send newsletter
+        env:
+          SUPABASE_URL:     ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY:     ${{ secrets.SUPABASE_KEY }}
+          BREVO_SMTP_USER:  ${{ secrets.BREVO_SMTP_USER }}
+          BREVO_SMTP_PASS:  ${{ secrets.BREVO_SMTP_PASS }}
+          NEWSAPI_KEY:      ${{ secrets.NEWSAPI_KEY }}
+          KITE_API_KEY:     ${{ secrets.KITE_API_KEY }}
+          KITE_API_SECRET:  ${{ secrets.KITE_API_SECRET }}
+        run: |
+          python backend/send_mail.py
