@@ -1,0 +1,7 @@
+name: Daily Newsletter
+
+on:
+  push:            # ← add this so every commit triggers a build
+  schedule:
+    - cron: '0 2 * * *'   # 08:00 IST
+  workflow_dispatch:
