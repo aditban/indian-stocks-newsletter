@@ -1,0 +1,8 @@
+
+yfinance
+requests
+pandas
+transformers
+jinja2
+supabase
+python-dotenv
