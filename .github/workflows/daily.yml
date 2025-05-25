@@ -1,27 +1,40 @@
+# .github/workflows/daily.yml
 name: Daily Newsletter
 
+# ─── Triggers ──────────────────────────────────────────────────────────
 on:
-  push:                    # remove this line later if you only want the daily run
+  push:                    # ← keep while you’re still testing; remove later if you
+                           #    want the job to run only on the daily cron
   schedule:
-    - cron: '0 2 * * *'    # 08:00 IST
-  workflow_dispatch:
+    - cron: '0 2 * * *'    # 08 : 00 IST every day
+  workflow_dispatch:       # manual “Run workflow” button in the UI
 
+# ─── Job definition ────────────────────────────────────────────────────
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # 1️⃣  Get the code
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      # 2️⃣  Set up Python
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Install deps
+      # 3️⃣  Install dependencies
+      - name: Install Python packages
         run: |
+          # CPU-only PyTorch wheel (≈200 MB) so Transformers can load FinBERT
+          pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+          # Everything else the project needs
           pip install -r backend/requirements.txt
 
-      - name: Send newsletter
+      # 4️⃣  Send the newsletter
+      - name: Run newsletter script
         env:
           SUPABASE_URL:     ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY:     ${{ secrets.SUPABASE_KEY }}
